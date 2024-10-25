@@ -3,7 +3,7 @@ import abc
 import dataclasses
 import functools
 import os
-from typing import Any, Dict, List, Optional, Tuple, Literal
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from sky import sky_logging
 from sky.utils import resources_utils
@@ -55,7 +55,7 @@ class ProvisionConfig:
     # Optional ports to open on launch of the cluster.
     ports_to_open_on_launch: Optional[List[int]]
     # Optional protocol to open for the ports (only used for RunPod)
-    protocol: Optional[Literal["http", "tcp"]] = None
+    protocol: Optional[Literal['http', 'tcp']] = None
 
 
 # -------------------- output data model -------------------- #

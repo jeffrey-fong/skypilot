@@ -2,7 +2,7 @@
 
 import base64
 import time
-from typing import Any, Dict, List, Optional, Literal
+from typing import Any, Dict, List, Literal, Optional
 
 from sky import sky_logging
 from sky.adaptors import runpod
@@ -100,7 +100,8 @@ def list_instances() -> Dict[str, Dict[str, Any]]:
 
 
 def launch(name: str, instance_type: str, region: str, disk_size: int,
-           image_name: str, ports: Optional[List[int]], protocol: Literal["http", "tcp"], public_key: str) -> str:
+           image_name: str, ports: Optional[List[int]],
+           protocol: Optional[Literal['http', 'tcp']], public_key: str) -> str:
     """Launches an instance with the given parameters.
 
     Converts the instance_type to the RunPod GPU name, finds the specs for the

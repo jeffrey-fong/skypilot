@@ -2,7 +2,7 @@
 import dataclasses
 import functools
 import textwrap
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, Literal
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union
 
 import colorama
 
@@ -62,7 +62,7 @@ class Resources:
         disk_size: Optional[int] = None,
         disk_tier: Optional[Union[str, resources_utils.DiskTier]] = None,
         ports: Optional[Union[int, str, List[str], Tuple[str]]] = None,
-        protocol: Optional[Literal["http", "tcp"]] = None,
+        protocol: Optional[Literal['http', 'tcp']] = None,
         labels: Optional[Dict[str, str]] = None,
         # Internal use only.
         # pylint: disable=invalid-name
@@ -448,7 +448,7 @@ class Resources:
         return self._ports
 
     @property
-    def protocol(self) -> Optional[Literal["http", "tcp"]]:
+    def protocol(self) -> Optional[Literal['http', 'tcp']]:
         return self._protocol
 
     @property
@@ -974,9 +974,10 @@ class Resources:
         """
         if self.protocol is None:
             return
-        if self.protocol not in ["http", "tcp"]:
+        if self.protocol not in ['http', 'tcp']:
             with ux_utils.print_exception_no_traceback():
-                raise ValueError(f"Invalid protocol: {self.protocol}. Must be 'http' or 'tcp'.")
+                raise ValueError(f'Invalid protocol: {self.protocol}. '
+                                 'Must be \'http\' or \'tcp\'.')
 
     def _try_validate_labels(self) -> None:
         """Try to validate the labels attribute.

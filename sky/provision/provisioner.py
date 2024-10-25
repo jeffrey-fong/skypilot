@@ -8,7 +8,7 @@ import socket
 import subprocess
 import time
 import traceback
-from typing import Dict, List, Optional, Tuple, Literal
+from typing import Dict, List, Literal, Optional, Tuple
 
 import colorama
 
@@ -106,7 +106,7 @@ def bulk_provision(
     prev_cluster_ever_up: bool,
     log_dir: str,
     ports_to_open_on_launch: Optional[List[int]] = None,
-    protocol: Optional[Literal["http", "tcp"]] = None,
+    protocol: Optional[Literal['http', 'tcp']] = None,
 ) -> provision_common.ProvisionRecord:
     """Provisions a cluster and wait until fully provisioned.
 
