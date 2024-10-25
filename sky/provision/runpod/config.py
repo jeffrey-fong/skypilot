@@ -8,4 +8,6 @@ def bootstrap_instances(
         config: common.ProvisionConfig) -> common.ProvisionConfig:
     """Bootstraps instances for the given cluster."""
     del region, cluster_name  # unused
+    if config.protocol is None: # default to tcp
+        config.protocol = "tcp"
     return config

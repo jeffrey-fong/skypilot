@@ -1518,7 +1518,8 @@ class RetryingVmProvisioner(object):
                         cluster_yaml=handle.cluster_yaml,
                         prev_cluster_ever_up=prev_cluster_ever_up,
                         log_dir=self.log_dir,
-                        ports_to_open_on_launch=ports_to_open_on_launch)
+                        ports_to_open_on_launch=ports_to_open_on_launch,
+                        protocol=to_provision.protocol)
                     # NOTE: We will handle the logic of '_ensure_cluster_ray_started' #pylint: disable=line-too-long
                     # in 'provision_utils.post_provision_runtime_setup()' in the
                     # caller.

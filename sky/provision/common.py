@@ -3,7 +3,7 @@ import abc
 import dataclasses
 import functools
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Literal
 
 from sky import sky_logging
 from sky.utils import resources_utils
@@ -54,6 +54,8 @@ class ProvisionConfig:
     resume_stopped_nodes: bool
     # Optional ports to open on launch of the cluster.
     ports_to_open_on_launch: Optional[List[int]]
+    # Optional protocol to open for the ports (only used for RunPod)
+    protocol: Optional[Literal["http", "tcp"]] = None
 
 
 # -------------------- output data model -------------------- #

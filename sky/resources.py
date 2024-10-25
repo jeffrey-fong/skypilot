@@ -2,7 +2,7 @@
 import dataclasses
 import functools
 import textwrap
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, Literal
 
 import colorama
 
@@ -62,6 +62,7 @@ class Resources:
         disk_size: Optional[int] = None,
         disk_tier: Optional[Union[str, resources_utils.DiskTier]] = None,
         ports: Optional[Union[int, str, List[str], Tuple[str]]] = None,
+        protocol: Optional[Literal["http", "tcp"]] = None,
         labels: Optional[Dict[str, str]] = None,
         # Internal use only.
         # pylint: disable=invalid-name
@@ -132,6 +133,7 @@ class Resources:
           disk_tier: the disk performance tier to use. If None, defaults to
             ``'medium'``.
           ports: the ports to open on the instance.
+          protocol: the protocol to use for the ports (only used for RunPod).
           labels: the labels to apply to the instance. These are useful for
             assigning metadata that may be used by external tools.
             Implementation depends on the chosen cloud - On AWS, labels map to
@@ -213,6 +215,8 @@ class Resources:
                 ports = None
         self._ports = ports
 
+        self._protocol = protocol
+
         self._labels = labels
 
         self._docker_login_config = _docker_login_config
@@ -232,6 +236,7 @@ class Resources:
         self._try_validate_image_id()
         self._try_validate_disk_tier()
         self._try_validate_ports()
+        self._try_validate_protocol()
         self._try_validate_labels()
 
     # When querying the accelerators inside this func (we call self.accelerators
@@ -302,6 +307,10 @@ class Resources:
         if self.ports is not None:
             ports = f', ports={self.ports}'
 
+        protocol = ''
+        if self.protocol is not None:
+            protocol = f', protocol={self.protocol}'
+
         if self._instance_type is not None:
             instance_type = f'{self._instance_type}'
         else:
@@ -313,7 +322,7 @@ class Resources:
         hardware_str = (
             f'{instance_type}{use_spot}'
             f'{cpus}{memory}{accelerators}{accelerator_args}{image_id}'
-            f'{disk_tier}{disk_size}{ports}')
+            f'{disk_tier}{disk_size}{ports}{protocol}')
         # It may have leading ',' (for example, instance_type not set) or empty
         # spaces.  Remove them.
         while hardware_str and hardware_str[0] in (',', ' '):
@@ -437,6 +446,10 @@ class Resources:
     @property
     def ports(self) -> Optional[List[str]]:
         return self._ports
+
+    @property
+    def protocol(self) -> Optional[Literal["http", "tcp"]]:
+        return self._protocol
 
     @property
     def labels(self) -> Optional[Dict[str, str]]:
@@ -953,6 +966,18 @@ class Resources:
         # We don't need to check the ports format since we already done it
         # in resources_utils.simplify_ports
 
+    def _try_validate_protocol(self) -> None:
+        """Try to validate the protocol attribute.
+
+        Raises:
+            ValueError: if the attribute is invalid.
+        """
+        if self.protocol is None:
+            return
+        if self.protocol not in ["http", "tcp"]:
+            with ux_utils.print_exception_no_traceback():
+                raise ValueError(f"Invalid protocol: {self.protocol}. Must be 'http' or 'tcp'.")
+
     def _try_validate_labels(self) -> None:
         """Try to validate the labels attribute.
 
@@ -1220,6 +1245,7 @@ class Resources:
             self.disk_tier is None,
             self._image_id is None,
             self.ports is None,
+            self.protocol is None,
             self._docker_login_config is None,
         ])
 
@@ -1242,6 +1268,7 @@ class Resources:
             image_id=override.pop('image_id', self.image_id),
             disk_tier=override.pop('disk_tier', self.disk_tier),
             ports=override.pop('ports', self.ports),
+            protocol=override.pop('protocol', self.protocol),
             labels=override.pop('labels', self.labels),
             _docker_login_config=override.pop('_docker_login_config',
                                               self._docker_login_config),
@@ -1403,6 +1430,7 @@ class Resources:
         resources_fields['image_id'] = config.pop('image_id', None)
         resources_fields['disk_tier'] = config.pop('disk_tier', None)
         resources_fields['ports'] = config.pop('ports', None)
+        resources_fields['protocol'] = config.pop('protocol', None)
         resources_fields['labels'] = config.pop('labels', None)
         resources_fields['_docker_login_config'] = config.pop(
             '_docker_login_config', None)
@@ -1450,6 +1478,7 @@ class Resources:
         if self.disk_tier is not None:
             config['disk_tier'] = self.disk_tier.value
         add_if_not_none('ports', self.ports)
+        add_if_not_none('protocol', self.protocol)
         add_if_not_none('labels', self.labels)
         if self._docker_login_config is not None:
             config['_docker_login_config'] = dataclasses.asdict(
